@@ -1,0 +1,23 @@
+# Geheimnisse (API-Keys, Passwörter) – niemals committen!
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Frontend (für später)
+node_modules/
+dist/
+
+# Editor / System
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Screenshots zum Debuggen
+bild/
