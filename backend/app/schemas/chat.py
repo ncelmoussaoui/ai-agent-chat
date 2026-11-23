@@ -9,6 +9,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
+    tools: list[str] = []  # welche Tools der Agent benutzt hat
 
 
 class Nachricht(BaseModel):

@@ -107,6 +107,15 @@ body {
   color: var(--error-text);
 }
 
+/* Hinweis unter einer Antwort, welche Tools benutzt wurden */
+.tool-info {
+  align-self: flex-start;
+  margin-top: -6px;
+  padding-left: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 /* Ladeanzeige: drei hüpfende Punkte */
 .typing {
   display: flex;

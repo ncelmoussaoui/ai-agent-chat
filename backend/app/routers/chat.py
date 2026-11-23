@@ -20,7 +20,7 @@ def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail=f"{DB_FEHLER}: {e}")
 
     try:
-        reply = get_reply(request.message, verlauf)
+        reply, tools = get_reply(request.message, verlauf)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"OpenAI-Fehler: {e}")
 
@@ -29,7 +29,7 @@ def chat(request: ChatRequest):
     except psycopg.OperationalError as e:
         raise HTTPException(status_code=500, detail=f"{DB_FEHLER}: {e}")
 
-    return ChatResponse(reply=reply)
+    return ChatResponse(reply=reply, tools=tools)
 
 
 @router.get("/nachrichten", response_model=list[Nachricht])

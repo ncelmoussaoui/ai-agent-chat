@@ -51,7 +51,17 @@ async function sendToBackend(message) {
     throw new Error(`Fehler ${response.status}: ${detail}`);
   }
 
-  return data.reply;
+  return data; // { reply: "...", tools: ["rechnen", ...] }
+}
+
+// Kleine Info unter der Antwort: welche Tools der Agent benutzt hat
+function addToolInfo(tools) {
+  if (!tools || tools.length === 0) return;
+  const div = document.createElement("div");
+  div.className = "tool-info";
+  div.textContent = `🔧 Benutzte Tools: ${[...new Set(tools)].join(", ")}`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
 // Wird ausgeführt, wenn man auf "Senden" klickt oder Enter drückt
@@ -69,9 +79,10 @@ form.addEventListener("submit", async (event) => {
   const typing = showTyping();
 
   try {
-    const reply = await sendToBackend(message);
+    const data = await sendToBackend(message);
     typing.remove();
-    addMessage(reply, "assistant");
+    addMessage(data.reply, "assistant");
+    addToolInfo(data.tools);
   } catch (error) {
     typing.remove();
     if (error instanceof TypeError) {
