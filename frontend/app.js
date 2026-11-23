@@ -43,15 +43,28 @@ async function sendToBackend(message) {
     body: JSON.stringify({ message: message }),
   });
 
-  const data = await response.json();
-
   if (!response.ok) {
-    // FastAPI schickt Fehler im Feld "detail"
-    const detail = typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail);
-    throw new Error(`Fehler ${response.status}: ${detail}`);
+    throw new Error(await fehlerText(response));
   }
 
-  return data; // { reply: "...", tools: ["rechnen", ...] }
+  return await response.json(); // { reply: "...", tools: ["rechnen", ...] }
+}
+
+// Verständliche Fehlermeldung aus einer Server-Antwort machen
+async function fehlerText(response) {
+  let detail = "";
+  try {
+    const data = await response.json();
+    if (typeof data.detail === "string") {
+      detail = data.detail; // z. B. "Die Datenbank ist nicht erreichbar..."
+    } else if (Array.isArray(data.detail)) {
+      // Validierungsfehler (422): Liste von Fehlern
+      detail = data.detail.map((f) => f.msg.replace("Value error, ", "")).join(", ");
+    }
+  } catch {
+    // Antwort war kein JSON (z. B. "Internal Server Error")
+  }
+  return detail || `Unerwarteter Serverfehler (${response.status}).`;
 }
 
 // Kleine Info unter der Antwort: welche Tools der Agent benutzt hat
@@ -118,8 +131,7 @@ async function loadHistory() {
   try {
     const response = await fetch(`${API_URL}/nachrichten`);
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(`Fehler ${response.status}: ${data.detail}`);
+      throw new Error(await fehlerText(response));
     }
     const nachrichten = await response.json();
 

@@ -3,7 +3,21 @@ from openai import OpenAI
 from app.config import OPENAI_API_KEY, OPENAI_MODEL
 from app.services.tools import TOOLS, tool_ausfuehren
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+class FehlenderApiKey(Exception):
+    """Wird ausgelöst, wenn OPENAI_API_KEY in der .env fehlt."""
+
+
+_client: OpenAI | None = None
+
+
+def get_client() -> OpenAI:
+    """OpenAI-Client erst beim ersten Gebrauch erstellen (so startet der Server auch ohne Key)."""
+    global _client
+    if _client is None:
+        if not OPENAI_API_KEY:
+            raise FehlenderApiKey()
+        _client = OpenAI(api_key=OPENAI_API_KEY)
+    return _client
 
 # Der System-Prompt gibt der KI ihre Rolle. Er wird bei jeder Anfrage als erstes mitgeschickt.
 SYSTEM_PROMPT = (
@@ -40,7 +54,7 @@ def get_reply(message: str, verlauf: list[dict] | None = None) -> tuple[str, lis
 
     # 4. Agent-Schleife: KI fragen -> Tools ausführen -> Ergebnis zurückgeben -> wieder fragen ...
     for _ in range(MAX_SCHRITTE):
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model=OPENAI_MODEL,
             messages=messages,
             tools=TOOLS,
