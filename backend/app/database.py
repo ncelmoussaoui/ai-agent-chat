@@ -20,6 +20,27 @@ def init_db():
         )
 
 
+def get_nachrichten(limit: int = 100):
+    """Die letzten `limit` Nachrichten holen, älteste zuerst."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, frage, antwort, erstellt_am FROM (
+                SELECT id, frage, antwort, erstellt_am
+                FROM nachrichten
+                ORDER BY id DESC
+                LIMIT %s
+            ) AS letzte
+            ORDER BY id ASC
+            """,
+            (limit,),
+        ).fetchall()
+    return [
+        {"id": r[0], "frage": r[1], "antwort": r[2], "erstellt_am": r[3]}
+        for r in rows
+    ]
+
+
 def save_messages(frage: str, antwort: str):
     with get_connection() as conn:
         conn.execute(

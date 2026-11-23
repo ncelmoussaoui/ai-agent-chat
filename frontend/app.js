@@ -101,4 +101,36 @@ function autoResize() {
 }
 input.addEventListener("input", autoResize);
 
+// Chatverlauf aus der Datenbank laden (wird beim Öffnen der Seite ausgeführt)
+async function loadHistory() {
+  statusText.textContent = "Lade Verlauf...";
+  try {
+    const response = await fetch(`${API_URL}/nachrichten`);
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(`Fehler ${response.status}: ${data.detail}`);
+    }
+    const nachrichten = await response.json();
+
+    if (nachrichten.length === 0) {
+      addMessage("Hallo! Ich bin dein KI-Assistent. Stell mir eine Frage.", "assistant");
+    }
+
+    // Jede Zeile aus der Tabelle = eine Frage + eine Antwort
+    for (const n of nachrichten) {
+      addMessage(n.frage, "user");
+      addMessage(n.antwort, "assistant");
+    }
+  } catch (error) {
+    if (error instanceof TypeError) {
+      addMessage("Verlauf konnte nicht geladen werden: Server nicht erreichbar. Läuft das Backend (uvicorn)?", "error");
+    } else {
+      addMessage(`Verlauf konnte nicht geladen werden. ${error.message}`, "error");
+    }
+  } finally {
+    statusText.textContent = "Bereit";
+  }
+}
+
+loadHistory();
 input.focus();
