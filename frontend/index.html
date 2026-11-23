@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>AI Agent Chat</h1>
+      <span id="status" class="status">Bereit</span>
+    </header>
+
+    <!-- Hier erscheinen die Chat-Nachrichten -->
+    <main id="chat" class="chat" aria-live="polite">
+      <div class="message assistant">
+        Hallo! Ich bin dein KI-Assistent. Stell mir eine Frage.
+      </div>
+    </main>
+
+    <!-- Eingabebereich -->
+    <form id="form" class="form">
+      <textarea
+        id="input"
+        class="input"
+        rows="1"
+        placeholder="Nachricht schreiben... (Enter = senden, Shift+Enter = neue Zeile)"
+        required
+      ></textarea>
+      <button id="send" class="send" type="submit">Senden</button>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
